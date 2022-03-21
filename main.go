@@ -96,7 +96,6 @@ func translate(source *string) {
 }
 
 func main() {
-	args := os.Args[1]
-	file := args + ".b"
+	file := os.Args[1] + ".b"
 	translate(&file)
 }
