@@ -30,7 +30,7 @@ func getResult(indent *int, fun *function, counter *int) string {
 	return strings.Repeat("\t", *indent) + strings.Replace(fun.code+"\n", "1", strconv.Itoa(*counter), 1)
 }
 
-func translate(source string) {
+func translate(source *string) {
 	const placeholder = "//{program}"
 	const testingDir = "testing/"
 	const resultDir = "result/"
@@ -46,7 +46,7 @@ func translate(source string) {
 		log.Fatal(err)
 	}
 
-	input, err := ioutil.ReadFile(filepath.Join(testingDir, source))
+	input, err := ioutil.ReadFile(filepath.Join(testingDir, *source))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -89,7 +89,7 @@ func translate(source string) {
 
 	program := strings.Replace(string(template), placeholder, result, 1)
 
-	err = ioutil.WriteFile(filepath.Join(resultDir, source+".js"), []byte(program), 0644)
+	err = ioutil.WriteFile(filepath.Join(resultDir, *source+".js"), []byte(program), 0644)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -97,5 +97,6 @@ func translate(source string) {
 
 func main() {
 	args := os.Args[1]
-	translate(args + ".b")
+	file := args + ".b"
+	translate(&file)
 }
