@@ -27,7 +27,15 @@ var tokens = map[string]function{
 }
 
 func getResult(indent *int, fun *function, counter *int) string {
-	return strings.Repeat("\t", *indent) + strings.Replace(fun.code+"\n", "1", strconv.Itoa(*counter), 1)
+	result := strings.Repeat("\t", *indent)
+
+	if fun.countable {
+		result += strings.Replace(fun.code, "1", strconv.Itoa(*counter), 1)
+	} else {
+		result += fun.code
+	}
+
+	return result + "\n"
 }
 
 func translate(source *string) {
@@ -52,10 +60,10 @@ func translate(source *string) {
 	}
 
 	for _, char := range input {
-		charToken := string(char)
+		currentToken := string(char)
 
-		if fun, err := tokens[charToken]; err {
-			if prevToken == charToken && fun.countable {
+		if fun, err := tokens[currentToken]; err {
+			if prevToken == currentToken && fun.countable {
 				repeatCounter++
 			} else {
 				if prevFunction.name == "loop_end" {
@@ -73,11 +81,11 @@ func translate(source *string) {
 				repeatCounter = 1
 			}
 
-			if charToken != "" {
-				prevFunction = tokens[charToken]
+			if currentToken != "" {
+				prevFunction = tokens[currentToken]
 			}
 
-			prevToken = charToken
+			prevToken = currentToken
 		}
 	}
 
