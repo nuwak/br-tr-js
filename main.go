@@ -47,7 +47,7 @@ func translate(source *string) {
 	repeatCounter := 1
 	prevToken := ""
 	indent := 1
-	var prevFunction function
+	var prevFun function
 
 	template, err := ioutil.ReadFile("template.js")
 	if err != nil {
@@ -62,19 +62,19 @@ func translate(source *string) {
 	for _, char := range input {
 		currentToken := string(char)
 
-		if fun, err := tokens[currentToken]; err {
+		if fun, ok := tokens[currentToken]; ok {
 			if prevToken == currentToken && fun.countable {
 				repeatCounter++
 			} else {
-				if prevFunction.name == "loop_end" {
+				if prevFun.name == "loop_end" {
 					indent--
-				} else if prevFunction.name == "loop_start" {
+				} else if prevFun.name == "loop_start" {
 					result += "\n"
 				}
 
-				result += getResult(&indent, &prevFunction, &repeatCounter)
+				result += getResult(&indent, &prevFun, &repeatCounter)
 
-				if prevFunction.name == "loop_start" {
+				if prevFun.name == "loop_start" {
 					indent++
 				}
 
@@ -82,18 +82,18 @@ func translate(source *string) {
 			}
 
 			if currentToken != "" {
-				prevFunction = tokens[currentToken]
+				prevFun = fun
 			}
 
 			prevToken = currentToken
 		}
 	}
 
-	if prevFunction.name == "loop_end" {
+	if prevFun.name == "loop_end" {
 		indent--
 	}
 
-	result += getResult(&indent, &prevFunction, &repeatCounter)
+	result += getResult(&indent, &prevFun, &repeatCounter)
 
 	program := strings.Replace(string(template), placeholder, result, 1)
 
